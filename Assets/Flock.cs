@@ -20,11 +20,22 @@ public class Flock : MonoBehaviour
     
     void Update()
     {
-        //Limitando alcance dos peixes//
+        //Limitando alcance dos peixes e confirmando colisão//
         Bounds b = new Bounds(myManager.transform.position, myManager.swinLimits * 2);
+
+        RaycastHit hit = new RaycastHit();
+        Vector3 direction = myManager.transform.position - transform.position;
+
         if (!b.Contains(transform.position))
         {
             turning = true;
+            direction = myManager.transform.position - transform.position;
+        }
+
+        else if(Physics.Raycast(transform.position, this.transform.forward * 50, out hit))
+        {
+            turning = true;
+            direction = Vector3.Reflect(this.transform.forward, hit.normal);
         }
         else
             turning = false;
@@ -32,7 +43,6 @@ public class Flock : MonoBehaviour
         if (turning)
         {
             //Adicionando movimento de rotação(curva) por Slerp//
-            Vector3 direction = myManager.transform.position - transform.position;
             transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.LookRotation(direction), myManager.rotationSpeed * Time.deltaTime);
         }
         else
